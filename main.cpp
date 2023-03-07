@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
 //    qmlRegisterType<databaseHandler>("com.databasehandler", 1, 0, "DBHandler");
+    qmlRegisterType<DataBaseHelper>("com.databasehelper", 1, 0, "DBHelper");
 
     QQmlApplicationEngine engine;
     const QUrl url(u"qrc:/clinicTest/main.qml"_qs);
@@ -25,12 +26,9 @@ int main(int argc, char *argv[])
 
 
 
-    DataBaseHelper db;
-
-    db.insertIntoTable(1, "ali");
-    db.insertIntoTable(5, "naghi");
-
-    db.showPatients();
+//    DataBaseHelper db;
+//    QUrl address{"file:///C:/Users/Steve/Pictures/Screenshots/Screenshot (1).png"};
+//    db.InsertImage(address);
 
 
     return app.exec();

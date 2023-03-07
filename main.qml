@@ -3,6 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
 //import com.databasehandler 1.0
+import com.databasehelper 1.0
 
 ApplicationWindow {
     width: 640
@@ -45,11 +46,16 @@ ApplicationWindow {
 //            image.source = selectedFile
 //            handler1.setImageUrl(selectedFile)
 //            console.log(selectedFile)
-
+            helper1.setImageUrl(selectedFile)
         }
     }
 
 //    DBHandler{
 //        id: handler1
 //    }
+
+
+    DBHelper{
+        id: helper1
+    }
 }

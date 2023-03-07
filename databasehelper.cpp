@@ -1,4 +1,5 @@
 #include "databasehelper.h"
+#include "qimage.h"
 
 
 DataBaseHelper::DataBaseHelper(QObject *parent)
@@ -9,6 +10,10 @@ DataBaseHelper::DataBaseHelper(QObject *parent)
 
     if (!checkForTable("names")){
         query->exec("CREATE TABLE names (id INTEGER PRIMARY KEY, name TEXT)");
+        qDebug() << "table created";
+    }
+    if (!checkForTable("images")){
+        query->exec("CREATE TABLE images (id INTEGER PRIMARY KEY, imageData BLOB)");
         qDebug() << "table created";
     }
 }
@@ -65,4 +70,52 @@ void DataBaseHelper::showPatients()
         QString name = query->value(1).toString();
         qDebug() << "ID" << id << "Name:" << name;
     }
+}
+
+void DataBaseHelper::InsertImage(QUrl imageUrl)
+{
+    addImageDatatoDB(obtainImageData(convertToQImage(imageUrl)), 48);
+}
+
+QUrl DataBaseHelper::getImageUrl()
+{
+    return imageUrl;
+}
+
+void DataBaseHelper::setImageUrl(QUrl url)
+{
+    imageUrl = url;
+    InsertImage(url);
+}
+
+
+QImage DataBaseHelper::convertToQImage(QUrl imageUrl)
+{
+    qDebug() << imageUrl;
+    QImage image;
+    if (!image.load(imageUrl.toLocalFile())) {
+        qWarning("Failed to load image");
+    }
+    return image;
+}
+
+QByteArray DataBaseHelper::obtainImageData(QImage image)
+{
+    QByteArray imageData;
+    QDataStream imageStream(&imageData,QIODevice::WriteOnly);
+    imageStream << image;
+    return imageData;
+}
+
+bool DataBaseHelper::addImageDatatoDB(QByteArray imageData, int id)
+{
+    query->prepare("INSERT INTO images (id, imageData) VALUES (:id, :data)");
+    query->bindValue(":id", id);
+    query->bindValue(":data", imageData);
+    if (!query->exec()) {
+        qWarning("Failed to insert image into database");
+        return false;
+    }
+    qWarning("added");
+    return true;
 }
