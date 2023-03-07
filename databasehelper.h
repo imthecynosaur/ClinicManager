@@ -5,30 +5,35 @@
 //#include <QSql>
 #include <QtSql>
 #include <QPixmap>
+#include <QImageReader>
 
 class DataBaseHelper : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QUrl imageUrl READ getImageUrl WRITE setImageUrl NOTIFY imageUrlChanged)
+//    Q_PROPERTY(QUrl imageUrl READ getImageUrl WRITE setImageUrl NOTIFY imageUrlChanged)
 public:
     explicit DataBaseHelper(QObject *parent = nullptr);
     ~DataBaseHelper();
 
 signals:
-    void imageUrlChanged();
+//    void imageUrlChanged();
 public slots:
     void insertIntoTable(int, QString);
     void showPatients();
-    void InsertImage(QUrl);
-    QUrl getImageUrl();
-    void setImageUrl(QUrl);
+//    void InsertImage(QUrl);
+//    QUrl getImageUrl();
+//    void setImageUrl(QUrl);
+    bool addImagetoDatabase(QUrl);
+    QByteArray getImageData();
+    void setImageData(QByteArray);
+    QImage creatImageFromData();
 
 private:
     QSqlDatabase db;
     QSqlQuery* query;
     bool intializeDb();
 
-    QUrl imageUrl;
+//    QUrl imageUrl;
 
     bool checkForTable(QString);
 
@@ -36,6 +41,8 @@ private:
     QImage convertToQImage(QUrl);
     QByteArray obtainImageData(QImage);
     bool addImageDatatoDB(QByteArray, int);
+
+    QByteArray imageData;
 };
 
 #endif // DATABASEHELPER_H

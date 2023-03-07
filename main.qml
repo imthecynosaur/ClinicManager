@@ -2,13 +2,15 @@ import QtCore
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
-//import com.databasehandler 1.0
 import com.databasehelper 1.0
+import MyTypes 1.0
 
 ApplicationWindow {
     width: 640
     height: 480
     visible: true
+
+    property QByteArray imageData
 
     header: ToolBar {
         Button {
@@ -20,7 +22,8 @@ ApplicationWindow {
         Button {
             id: downloader
             text: qsTr("Choose Image from saved...")
-//            onClicked: image.source = handler1.getImageUrl()
+
+            onClicked: helper1.creatImageFromData()
             x: 150
         }
 
@@ -44,16 +47,9 @@ ApplicationWindow {
         currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
         onAccepted:{
 //            image.source = selectedFile
-//            handler1.setImageUrl(selectedFile)
-//            console.log(selectedFile)
-            helper1.setImageUrl(selectedFile)
+            helper1.addImagetoDatabase(selectedFile)
         }
     }
-
-//    DBHandler{
-//        id: handler1
-//    }
-
 
     DBHelper{
         id: helper1

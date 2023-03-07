@@ -13,6 +13,9 @@ qt_add_executable(appclinicTest
 #    databasehandler.cpp
     databasehelper.h
     databasehelper.cpp
+#    imageloader.h
+#    imageloader.cpp
+
 )
 
 qt_add_qml_module(appclinicTest

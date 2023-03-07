@@ -72,39 +72,67 @@ void DataBaseHelper::showPatients()
     }
 }
 
-void DataBaseHelper::InsertImage(QUrl imageUrl)
+//void DataBaseHelper::InsertImage(QUrl imageUrl)
+//{
+//    addImageDatatoDB(obtainImageData(convertToQImage(imageUrl)), 48);
+//}
+
+//QUrl DataBaseHelper::getImageUrl()
+//{
+//    return imageUrl;
+//}
+
+//void DataBaseHelper::setImageUrl(QUrl url)
+//{
+//    imageUrl = url;
+//    InsertImage(url);
+//}
+
+bool DataBaseHelper::addImagetoDatabase(QUrl imageUrl)
 {
-    addImageDatatoDB(obtainImageData(convertToQImage(imageUrl)), 48);
+    if (addImageDatatoDB(obtainImageData(convertToQImage(imageUrl)), 87)){
+        return true;
+    }
+    return false;
 }
 
-QUrl DataBaseHelper::getImageUrl()
+QByteArray DataBaseHelper::getImageData()
 {
-    return imageUrl;
+    return imageData;
 }
 
-void DataBaseHelper::setImageUrl(QUrl url)
+void DataBaseHelper::setImageData(QByteArray imageData)
 {
-    imageUrl = url;
-    InsertImage(url);
+    this->imageData = imageData;
+}
+
+QImage DataBaseHelper::creatImageFromData()
+{
+    QImage image;
+    image.loadFromData(imageData);
+    return image;
 }
 
 
 QImage DataBaseHelper::convertToQImage(QUrl imageUrl)
 {
-    qDebug() << imageUrl;
     QImage image;
     if (!image.load(imageUrl.toLocalFile())) {
         qWarning("Failed to load image");
     }
+    qDebug() << image;
     return image;
 }
 
 QByteArray DataBaseHelper::obtainImageData(QImage image)
 {
-    QByteArray imageData;
-    QDataStream imageStream(&imageData,QIODevice::WriteOnly);
-    imageStream << image;
-    return imageData;
+    QPixmap inPixmap = QPixmap::fromImage(image);
+    QByteArray inByteArray;
+    QBuffer inBuffer( &inByteArray );
+    inBuffer.open( QIODevice::WriteOnly );
+    inPixmap.save( &inBuffer, "PNG" );
+    setImageData(inByteArray);
+    return inByteArray;
 }
 
 bool DataBaseHelper::addImageDatatoDB(QByteArray imageData, int id)
