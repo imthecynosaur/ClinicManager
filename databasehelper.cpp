@@ -8,12 +8,12 @@ DataBaseHelper::DataBaseHelper(QObject *parent)
     intializeDb();
     query = new QSqlQuery;
 
-    if (!checkForTable("names")){
-        query->exec("CREATE TABLE names (id INTEGER PRIMARY KEY, name TEXT)");
-        qDebug() << "table created";
-    }
     if (!checkForTable("images")){
         query->exec("CREATE TABLE images (id INTEGER PRIMARY KEY, imageData BLOB)");
+        qDebug() << "table created";
+    }
+    if (!checkForTable("patients")){
+        query->exec("CREATE TABLE patients (id INTEGER PRIMARY KEY, firstName TEXT, lastName TEXT, imageData BLOB)");
         qDebug() << "table created";
     }
 }
@@ -51,20 +51,25 @@ bool DataBaseHelper::checkForTable(QString tableName)
     }
 }
 
-void DataBaseHelper::insertIntoTable(int id, QString name)
+bool DataBaseHelper::insertIntoTable(int id, QString firstName, QString lastName, QUrl imageUrl)
 {
-//    query->exec("SELECT ")
-    query->prepare("INSERT INTO names (id, name) VALUES (:id, :name)");
+    QByteArray imageData  = obtainImageData(convertToQImage(imageUrl));
+    query->prepare("INSERT INTO patients (id, firstName, lastName, imageData) VALUES (:id, :firstName, :lastName, :imageData)");
     query->bindValue(":id", id);
-    query->bindValue(":name", name);
+    query->bindValue(":firstName", firstName);
+    query->bindValue(":lastName", lastName);
+    query->bindValue(":data", imageData);
     if (!query->exec()){
         qWarning() << "something went wrong";
+        return false;
     }
+    qDebug() << "patient" << id << "added to database";
+    return true;
 }
 
 void DataBaseHelper::showPatients()
 {
-    query->exec("SELECT * FROM names");
+    query->exec("SELECT * FROM patients");
     while (query->next()) {
         int id = query->value(0).toInt();
         QString name = query->value(1).toString();
@@ -72,16 +77,7 @@ void DataBaseHelper::showPatients()
     }
 }
 
-bool DataBaseHelper::addImagetoDatabase(QUrl imageUrl)
-{
-    int tempID = QRandomGenerator::global()->bounded(1000);
-    if (addImageDatatoDB(obtainImageData(convertToQImage(imageUrl)), tempID)){
-        qDebug() << tempID;
-        IDs.append(tempID);
-        return true;
-    }
-    return false;
-}
+
 
 QByteArray DataBaseHelper::fetchImageData(int id)
 {
@@ -126,7 +122,16 @@ QPixmap DataBaseHelper::creatImageFromData()
     return pixmap;
 }
 
-
+bool DataBaseHelper::addImagetoDatabase(QUrl imageUrl)
+{
+    int tempID = QRandomGenerator::global()->bounded(1000);
+    if (addImageDatatoDB(obtainImageData(convertToQImage(imageUrl)), tempID)){
+        qDebug() << tempID;
+        IDs.append(tempID);
+        return true;
+    }
+    return false;
+}
 
 QImage DataBaseHelper::convertToQImage(QUrl imageUrl)
 {
