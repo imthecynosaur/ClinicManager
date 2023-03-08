@@ -2,45 +2,32 @@
 #define DATABASEHELPER_H
 
 #include <QObject>
-//#include <QSql>
 #include <QtSql>
 #include <QPixmap>
 #include <QImageReader>
 #include <QStandardPaths>
 
-//#include "imageprovider.h"
-
 
 class DataBaseHelper : public QObject
 {
     Q_OBJECT
-//    Q_PROPERTY(QUrl imageUrl READ getImageUrl WRITE setImageUrl NOTIFY imageUrlChanged)
 public:
     explicit DataBaseHelper(QObject *parent = nullptr);
     ~DataBaseHelper();
 
 signals:
-//    void imageUrlChanged();
-//    void sendImage(QImage);
 public slots:
     void insertIntoTable(int, QString);
     void showPatients();
-//    void InsertImage(QUrl);
-//    QUrl getImageUrl();
-//    void setImageUrl(QUrl);
     bool addImagetoDatabase(QUrl);
-    QByteArray getImageData();
-    void setImageData(QByteArray);
+    QByteArray fetchImageData(int);
     QPixmap creatImageFromData();
-//    void recieveImageRequest();
 
 
 private:
     QSqlDatabase db;
     QSqlQuery* query;
     bool intializeDb();
-
-//    QUrl imageUrl;
 
     bool checkForTable(QString);
 
@@ -51,7 +38,7 @@ private:
 
     QImage image;
 
-    QByteArray imageData;
+    QList<int> IDs;
 };
 
 #endif // DATABASEHELPER_H

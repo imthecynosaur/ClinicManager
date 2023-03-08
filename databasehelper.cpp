@@ -72,54 +72,44 @@ void DataBaseHelper::showPatients()
     }
 }
 
-//void DataBaseHelper::InsertImage(QUrl imageUrl)
-//{
-//    addImageDatatoDB(obtainImageData(convertToQImage(imageUrl)), 48);
-//}
-
-//QUrl DataBaseHelper::getImageUrl()
-//{
-//    return imageUrl;
-//}
-
-//void DataBaseHelper::setImageUrl(QUrl url)
-//{
-//    imageUrl = url;
-//    InsertImage(url);
-//}
-
 bool DataBaseHelper::addImagetoDatabase(QUrl imageUrl)
 {
     int tempID = QRandomGenerator::global()->bounded(1000);
     if (addImageDatatoDB(obtainImageData(convertToQImage(imageUrl)), tempID)){
         qDebug() << tempID;
+        IDs.append(tempID);
         return true;
     }
     return false;
 }
 
-QByteArray DataBaseHelper::getImageData()
+QByteArray DataBaseHelper::fetchImageData(int id)
 {
-    return imageData;
+    query->prepare("SELECT imageData FROM images WHERE id = :id");
+    query->bindValue(":id", id);
+    query->exec();
+
+    if (query->next()) {
+        QByteArray imageData = query->value(0).toByteArray();
+        qDebug() << "imageData fetched";
+        return imageData;
+    }else{
+        qWarning("failed to fectch imageData");
+    }
 }
 
-void DataBaseHelper::setImageData(QByteArray imageData)
-{
-    this->imageData = imageData;
-}
 
 QPixmap DataBaseHelper::creatImageFromData()
 {
-//    ImageItem item;
-//    this->connect(this, &DataBaseHelper::sendImage, &item, &ImageItem::setImage);
-    QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-
+    int id = IDs[IDs.size()-1];
+    qDebug() << "id" << id;
+    QByteArray imageData{fetchImageData(id)};
     QImage image;
     image.loadFromData(imageData);
     QPixmap pixmap = QPixmap::fromImage(image);
     this->image = image;
-//    emit sendImage(image);
     qDebug() << pixmap;
+    QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
     QString filepath = desktopPath + "/random.png";
     qDebug() << filepath;
     if (!pixmap.save(filepath, "PNG")){
@@ -136,10 +126,6 @@ QPixmap DataBaseHelper::creatImageFromData()
     return pixmap;
 }
 
-//void DataBaseHelper::recieveImageRequest()
-//{
-//    emit sendImage(image);
-//}
 
 
 QImage DataBaseHelper::convertToQImage(QUrl imageUrl)
@@ -159,7 +145,6 @@ QByteArray DataBaseHelper::obtainImageData(QImage image)
     QBuffer inBuffer( &inByteArray );
     inBuffer.open( QIODevice::WriteOnly );
     inPixmap.save( &inBuffer, "PNG" );
-    setImageData(inByteArray);
     return inByteArray;
 }
 
