@@ -156,6 +156,8 @@ Window {
             highlighted: false
             onClicked: {
                 image.source = "file:///" + helper.creatImageFromData(userID.text)
+                firstName.text = helper.getFirstName(userID.text)
+                lastName.text = helper.getLastName(userID.text)
             }
         }
     }
@@ -165,7 +167,6 @@ Window {
         currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
         onAccepted:{
                         image.source = selectedFile
-//            helper.addImagetoDatabase(selectedFile)
         }
     }
 

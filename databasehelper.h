@@ -18,10 +18,10 @@ public:
 signals:
 public slots:
     bool insertIntoTable(int, QString, QString, QUrl);
-    void showPatients();
-//    bool addImagetoDatabase(QUrl);
     QByteArray fetchImageData(int);
     QUrl creatImageFromData(int);
+    QString getFirstName(int);
+    QString getLastName(int);
 
 
 private:
