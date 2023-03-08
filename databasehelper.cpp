@@ -13,7 +13,7 @@ DataBaseHelper::DataBaseHelper(QObject *parent)
         qDebug() << "table created";
     }
     if (!checkForTable("patients")){
-        query->exec("CREATE TABLE patients (id INTEGER PRIMARY KEY, firstName TEXT, lastName TEXT, imageData BLOB)");
+        query->exec("CREATE TABLE patients (id INTEGER PRIMARY KEY, firstName TEXT, lastName TEXT)");
         qDebug() << "table created";
     }
 }
@@ -51,21 +51,7 @@ bool DataBaseHelper::checkForTable(QString tableName)
     }
 }
 
-bool DataBaseHelper::insertIntoTable(int id, QString firstName, QString lastName, QUrl imageUrl)
-{
-    QByteArray imageData  = obtainImageData(convertToQImage(imageUrl));
-    query->prepare("INSERT INTO patients (id, firstName, lastName, imageData) VALUES (:id, :firstName, :lastName, :imageData)");
-    query->bindValue(":id", id);
-    query->bindValue(":firstName", firstName);
-    query->bindValue(":lastName", lastName);
-    query->bindValue(":data", imageData);
-    if (!query->exec()){
-        qWarning() << "something went wrong";
-        return false;
-    }
-    qDebug() << "patient" << id << "added to database";
-    return true;
-}
+
 
 void DataBaseHelper::showPatients()
 {
@@ -95,10 +81,8 @@ QByteArray DataBaseHelper::fetchImageData(int id)
 }
 
 
-QPixmap DataBaseHelper::creatImageFromData()
+QUrl DataBaseHelper::creatImageFromData(int id)
 {
-    int id = IDs[IDs.size()-1];
-    qDebug() << "id" << id;
     QByteArray imageData{fetchImageData(id)};
     QImage image;
     image.loadFromData(imageData);
@@ -111,27 +95,33 @@ QPixmap DataBaseHelper::creatImageFromData()
     if (!pixmap.save(filepath, "PNG")){
         qDebug() << "failed to save image on local disk";
     }
+    QUrl url(filepath);
 
-
+    qDebug() << url;
 //     QByteArray bytes;
 //     QBuffer buffer(&bytes);
 //     buffer.open(QIODevice::WriteOnly);
 //     pixmap.save(&buffer, "PNG");
-
-
-    return pixmap;
+    return url;
 }
 
-bool DataBaseHelper::addImagetoDatabase(QUrl imageUrl)
+
+bool DataBaseHelper::insertIntoTable(int id, QString firstName, QString lastName, QUrl imageUrl)
 {
-    int tempID = QRandomGenerator::global()->bounded(1000);
-    if (addImageDatatoDB(obtainImageData(convertToQImage(imageUrl)), tempID)){
-        qDebug() << tempID;
-        IDs.append(tempID);
-        return true;
+    addImageDatatoDB(obtainImageData(convertToQImage(imageUrl)), id);
+    query->prepare("INSERT INTO patients (id, firstName, lastName) VALUES (:id, :firstName, :lastName)");
+    query->bindValue(":id", id);
+    query->bindValue(":firstName", firstName);
+    query->bindValue(":lastName", lastName);
+    if (!query->exec()){
+        qWarning() << "something went wrong";
+        return false;
     }
-    return false;
+    qDebug() << "patient" << id << "added to database";
+    return true;
 }
+
+
 
 QImage DataBaseHelper::convertToQImage(QUrl imageUrl)
 {
@@ -139,7 +129,6 @@ QImage DataBaseHelper::convertToQImage(QUrl imageUrl)
     if (!image.load(imageUrl.toLocalFile())) {
         qWarning("Failed to load image");
     }
-    qDebug() << image;
     return image;
 }
 
@@ -152,6 +141,17 @@ QByteArray DataBaseHelper::obtainImageData(QImage image)
     inPixmap.save( &inBuffer, "PNG" );
     return inByteArray;
 }
+
+//bool DataBaseHelper::addImagetoDatabase(QUrl imageUrl)
+//{
+//    int tempID = QRandomGenerator::global()->bounded(1000);
+//    if (addImageDatatoDB(obtainImageData(convertToQImage(imageUrl)), tempID)){
+//        qDebug() << tempID;
+//        IDs.append(tempID);
+//        return true;
+//    }
+//    return false;
+//}
 
 bool DataBaseHelper::addImageDatatoDB(QByteArray imageData, int id)
 {

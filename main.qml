@@ -5,8 +5,10 @@ import QtQuick.Dialogs
 import com.databasehelper 1.0
 
 Window {
-    width: 640
-    height: 480
+    minimumHeight: 480
+    maximumHeight: 480
+    minimumWidth: 640
+    maximumWidth: 640
     visible: true
 
     Column {
@@ -136,6 +138,13 @@ Window {
             icon.color: "#000000"
             font.pointSize: 11
             flat: false
+            onClicked: {
+                helper.insertIntoTable(userID.text, firstName.text, lastName.text, image.source)
+                userID.text = ""
+                firstName.text = ""
+                lastName.text = ""
+                image.source = "file:///D:/C++/Qt projects/cmakeTest/clinicTest/resources/user.svg"
+            }
         }
 
         Button {
@@ -145,6 +154,9 @@ Window {
             text: qsTr("Find user")
             font.pointSize: 11
             highlighted: false
+            onClicked: {
+                image.source = "file:///" + helper.creatImageFromData(userID.text)
+            }
         }
     }
 
@@ -152,13 +164,9 @@ Window {
         id: fileDialog
         currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
         onAccepted:{
-            //            image.source = selectedFile
-            helper1.addImagetoDatabase(selectedFile)
+                        image.source = selectedFile
+//            helper.addImagetoDatabase(selectedFile)
         }
-    }
-
-    DBHelper{
-        id: helper1
     }
 
     Rectangle {
@@ -205,6 +213,7 @@ Window {
                 text: qsTr("Browse")
                 anchors.fill: parent
                 flat: true
+                onClicked: fileDialog.open()
             }
         }
 
@@ -219,11 +228,21 @@ Window {
                 text: qsTr("close")
                 anchors.fill: parent
                 flat: true
+                onClicked:
+                {
+                    userID.text = ""
+                    firstName.text = ""
+                    lastName.text = ""
+                    image.source = "file:///D:/C++/Qt projects/cmakeTest/clinicTest/resources/user.svg"
+                }
+
             }
         }
     }
 
-
+    DBHelper{
+        id: helper
+    }
 
 
 

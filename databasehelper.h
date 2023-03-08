@@ -19,9 +19,9 @@ signals:
 public slots:
     bool insertIntoTable(int, QString, QString, QUrl);
     void showPatients();
-    bool addImagetoDatabase(QUrl);
+//    bool addImagetoDatabase(QUrl);
     QByteArray fetchImageData(int);
-    QPixmap creatImageFromData();
+    QUrl creatImageFromData(int);
 
 
 private:
