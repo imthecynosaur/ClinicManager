@@ -3,18 +3,20 @@
 #include <QCoreApplication>
 
 #include "databasehelper.h"
-
-
-//#include "databasehandler.h"
+//#include "imageprovider.h"
 
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
+//    ImageProvider IP;
+//    QImage image;
+//    IP.setQpixmap(image);
+
+
 //    qmlRegisterType<databaseHandler>("com.databasehandler", 1, 0, "DBHandler");
     qmlRegisterType<DataBaseHelper>("com.databasehelper", 1, 0, "DBHelper");
-    qmlRegisterType<QByteArray>("MyTypes", 1, 0, "QByteArray");
 
     QQmlApplicationEngine engine;
     const QUrl url(u"qrc:/clinicTest/main.qml"_qs);

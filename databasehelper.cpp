@@ -90,7 +90,9 @@ void DataBaseHelper::showPatients()
 
 bool DataBaseHelper::addImagetoDatabase(QUrl imageUrl)
 {
-    if (addImageDatatoDB(obtainImageData(convertToQImage(imageUrl)), 87)){
+    int tempID = QRandomGenerator::global()->bounded(1000);
+    if (addImageDatatoDB(obtainImageData(convertToQImage(imageUrl)), tempID)){
+        qDebug() << tempID;
         return true;
     }
     return false;
@@ -106,12 +108,38 @@ void DataBaseHelper::setImageData(QByteArray imageData)
     this->imageData = imageData;
 }
 
-QImage DataBaseHelper::creatImageFromData()
+QPixmap DataBaseHelper::creatImageFromData()
 {
+//    ImageItem item;
+//    this->connect(this, &DataBaseHelper::sendImage, &item, &ImageItem::setImage);
+    QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+
     QImage image;
     image.loadFromData(imageData);
-    return image;
+    QPixmap pixmap = QPixmap::fromImage(image);
+    this->image = image;
+//    emit sendImage(image);
+    qDebug() << pixmap;
+    QString filepath = desktopPath + "/random.png";
+    qDebug() << filepath;
+    if (!pixmap.save(filepath, "PNG")){
+        qDebug() << "failed to save image on local disk";
+    }
+
+
+//     QByteArray bytes;
+//     QBuffer buffer(&bytes);
+//     buffer.open(QIODevice::WriteOnly);
+//     pixmap.save(&buffer, "PNG");
+
+
+    return pixmap;
 }
+
+//void DataBaseHelper::recieveImageRequest()
+//{
+//    emit sendImage(image);
+//}
 
 
 QImage DataBaseHelper::convertToQImage(QUrl imageUrl)

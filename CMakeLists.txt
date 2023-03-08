@@ -9,12 +9,13 @@ find_package(Qt6 6.2 COMPONENTS Quick Sql REQUIRED)
 
 qt_add_executable(appclinicTest
     main.cpp
-#    databasehandler.h
-#    databasehandler.cpp
     databasehelper.h
     databasehelper.cpp
-#    imageloader.h
-#    imageloader.cpp
+#    imageprovider.h
+#    imageprovider.cpp
+#    imageitem.h
+#    imageitem.cpp
+
 
 )
 

@@ -6,6 +6,10 @@
 #include <QtSql>
 #include <QPixmap>
 #include <QImageReader>
+#include <QStandardPaths>
+
+//#include "imageprovider.h"
+
 
 class DataBaseHelper : public QObject
 {
@@ -17,6 +21,7 @@ public:
 
 signals:
 //    void imageUrlChanged();
+//    void sendImage(QImage);
 public slots:
     void insertIntoTable(int, QString);
     void showPatients();
@@ -26,7 +31,9 @@ public slots:
     bool addImagetoDatabase(QUrl);
     QByteArray getImageData();
     void setImageData(QByteArray);
-    QImage creatImageFromData();
+    QPixmap creatImageFromData();
+//    void recieveImageRequest();
+
 
 private:
     QSqlDatabase db;
@@ -41,6 +48,8 @@ private:
     QImage convertToQImage(QUrl);
     QByteArray obtainImageData(QImage);
     bool addImageDatatoDB(QByteArray, int);
+
+    QImage image;
 
     QByteArray imageData;
 };
