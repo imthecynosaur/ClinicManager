@@ -18,7 +18,6 @@ public:
 signals:
 public slots:
     bool insertIntoTable(int, QString, QString, QUrl);
-    QByteArray fetchImageData(int);
     QUrl creatImageFromData(int);
     QString getFirstName(int);
     QString getLastName(int);
@@ -31,14 +30,10 @@ private:
 
     bool checkForTable(QString);
 
-
     QImage convertToQImage(QUrl);
     QByteArray obtainImageData(QImage);
     bool addImageDatatoDB(QByteArray, int);
-
-    QImage image;
-
-    QList<int> IDs;
+    QByteArray fetchImageData(int);
 };
 
 #endif // DATABASEHELPER_H

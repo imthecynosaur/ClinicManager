@@ -72,21 +72,21 @@ QString DataBaseHelper::getLastName(int id)
 }
 
 
-bool DataBaseHelper::insertIntoTable(int id, QString firstName, QString lastName, QUrl imageUrl)
-{
-    addImageDatatoDB(obtainImageData(convertToQImage(imageUrl)), id);
-    query->prepare("INSERT INTO patients (id, firstName, lastName) VALUES (:id, :firstName, :lastName)");
-    query->bindValue(":id", id);
-    query->bindValue(":firstName", firstName);
-    query->bindValue(":lastName", lastName);
-    if (!query->exec()){
-        qWarning() << "something went wrong";
-        return false;
-    }
-    qDebug() << "patient" << id << "added to database";
-    return true;
-}
 
+QUrl DataBaseHelper::creatImageFromData(int id)
+{
+    QByteArray imageData{fetchImageData(id)};
+    QImage image;
+    image.loadFromData(imageData);
+    QPixmap pixmap = QPixmap::fromImage(image);
+    QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    QString filepath = desktopPath + "/random.png";
+    if (!pixmap.save(filepath, "PNG")){
+        qDebug() << "failed to save image on local disk";
+    }
+    QUrl url(filepath);
+    return url;
+}
 
 
 QByteArray DataBaseHelper::fetchImageData(int id)
@@ -105,31 +105,21 @@ QByteArray DataBaseHelper::fetchImageData(int id)
 }
 
 
-QUrl DataBaseHelper::creatImageFromData(int id)
+
+bool DataBaseHelper::insertIntoTable(int id, QString firstName, QString lastName, QUrl imageUrl)
 {
-    QByteArray imageData{fetchImageData(id)};
-    QImage image;
-    image.loadFromData(imageData);
-    QPixmap pixmap = QPixmap::fromImage(image);
-    this->image = image;
-    qDebug() << pixmap;
-    QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-    QString filepath = desktopPath + "/random.png";
-    qDebug() << filepath;
-    if (!pixmap.save(filepath, "PNG")){
-        qDebug() << "failed to save image on local disk";
+    addImageDatatoDB(obtainImageData(convertToQImage(imageUrl)), id);
+    query->prepare("INSERT INTO patients (id, firstName, lastName) VALUES (:id, :firstName, :lastName)");
+    query->bindValue(":id", id);
+    query->bindValue(":firstName", firstName);
+    query->bindValue(":lastName", lastName);
+    if (!query->exec()){
+        qWarning() << "something went wrong";
+        return false;
     }
-    QUrl url(filepath);
-
-    qDebug() << url;
-//     QByteArray bytes;
-//     QBuffer buffer(&bytes);
-//     buffer.open(QIODevice::WriteOnly);
-//     pixmap.save(&buffer, "PNG");
-    return url;
+    qDebug() << "patient" << id << "added to database";
+    return true;
 }
-
-
 
 QImage DataBaseHelper::convertToQImage(QUrl imageUrl)
 {
